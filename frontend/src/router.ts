@@ -1,15 +1,16 @@
 import * as VueRouter from "vue-router";
-import HelloWorldVue from "./components/HelloWorld.vue";
-import NotFound from "./components/NotFound.vue";
+import Home from "./pages/Home.vue";
+
+import NotFound from "./pages/NotFound.vue";
 
 const routes = [
-	{ path: "/test", name: "Test", component: HelloWorldVue },
-	{ path: "/:pathMatch(.*)*", name: "NotFound", component: NotFound },
+  { path: "/home", name: "home", component: Home },
+  { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFound },
 ];
 
 const router = VueRouter.createRouter({
-	history: VueRouter.createWebHistory(),
-	routes,
+  history: VueRouter.createWebHistory(),
+  routes,
 });
 
 export default router;
