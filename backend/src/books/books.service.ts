@@ -25,13 +25,36 @@ export class BooksService {
       const res = await axios.post(
         `http://${process.env.DB_URL}/library/_search`,
         {
+          size: 10000,
           query: {
             match_all: {},
+          },
+          aggs: {
+            prix_moyen: {
+              avg: {
+                field: 'price',
+              },
+            },
+            categories: {
+              terms: {
+                field: 'category.keyword',
+              },
+            },
+            subCategories: {
+              terms: {
+                field: 'subCategory.keyword',
+              },
+            },
+            editionNames: {
+              terms: {
+                field: 'edition.name.keyword',
+              },
+            },
           },
         },
       );
 
-      return res.data.hits.hits;
+      return res.data;
     } catch (error) {
       console.log(error);
       throw new ServiceUnavailableException(
@@ -85,40 +108,42 @@ export class BooksService {
       const res = await axios.post(
         `http://${process.env.DB_URL}/library/_search`,
         {
+          size: 10000,
           query: {
             bool: {
               should: [
-                {
-                  match: {
-                    title: {
-                      query: query.text,
-                      boost: 2,
-                    },
-                  },
-                },
-                {
-                  match: {
-                    author: {
-                      query: query.text,
-                      boost: 1,
-                    }
-                  },
-                },
-                {
-                  match: {
-                    description: {
-                      query: query.text,
-                      boost: 1,
-                    }
-                  },
-                }
+                { match: { title: { query: query.text, boost: 1 } } },
+                { match: { description: query.text } },
+                { match: { 'author.fullname': query.text } },
               ],
+            },
+          },
+          aggs: {
+            prix_moyen: {
+              avg: {
+                field: 'price',
+              },
+            },
+            categories: {
+              terms: {
+                field: 'category.keyword',
+              },
+            },
+            subCategories: {
+              terms: {
+                field: 'subCategory.keyword',
+              },
+            },
+            editionNames: {
+              terms: {
+                field: 'edition.name.keyword',
+              },
             },
           },
         },
       );
 
-      return res.data.hits.hits;
+      return res.data;
     } catch (error) {
       throw new ServiceUnavailableException(
         error.message ?? error.response ?? error,
