@@ -2,7 +2,7 @@
 export default {
     data() {
     return {
-        searchText: '',
+        searchText: "",
         searchResult: null
     };
   },
@@ -10,13 +10,13 @@ export default {
     async search() {
       try {
         // Faites votre requête fetch ici
-        const response = await fetch('http://127.0.0.1/search', {
+        const response = await fetch('http://127.0.0.1:3000/books/search', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json' 
           },
           body: JSON.stringify({
-            search: this.searchText
+            text: this.searchText
           })
         });
 
@@ -34,7 +34,7 @@ export default {
 
 <template>
     <div class="topBarBody" >
-        <h1 class="topBarTitle">TopBar</h1>
+        <h1 class="topBarTitle">Bouquin+</h1>
 
         <form action="search" @submit.prevent="search">
             <input class="searchInput" type="text" placeholder="Search..." v-model="searchText" />
