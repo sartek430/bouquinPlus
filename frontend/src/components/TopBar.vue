@@ -21,7 +21,8 @@ export default {
         });
 
         const data = await response.json();
-        this.searchResult = data.hits.hits.map((hit: any) => hit._source);
+        this.searchResult = data.hits.hits;
+        console.log("Résultat de la recherche : ", this.searchResult);
       } catch (error) {
         console.error("Erreur lors de la recherche : ", error);
       }
@@ -44,7 +45,7 @@ export default {
     </form>
     <ul v-if="searchResult && searchResult.length">
       <li v-for="(result, index) in searchResult" :key="index">
-        {{ result.author.fullname }}, <strong>{{ result.title }}</strong>
+        <span v-html="result.highlight['author.fullname'][0]"></span>, <strong><span v-html="result.highlight['title'][0]"></span></strong>
       </li>
     </ul>
     <p v-else>Aucun résultat trouvé.</p>
@@ -76,21 +77,5 @@ export default {
   padding-left: 10px;
   padding: 5px;
   font-family: "Courier New", Courier, monospace;
-}
-
-.searchButton {
-  margin-left: 10px;
-  border: 1px solid #888;
-  border-radius: 5px;
-  width: 100px;
-  height: 30px;
-  padding: 5px;
-  font-family: "Courier New", Courier, monospace;
-}
-
-.searchButton:hover {
-  background-color: #888;
-  color: #f3f3f3;
-  cursor: pointer;
 }
 </style>
