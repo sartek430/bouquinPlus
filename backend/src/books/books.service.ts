@@ -26,7 +26,7 @@ export class BooksService {
       const res = await axios.post(
         `http://${process.env.DB_URL}/library/_search`,
         {
-          size: 10000,
+          size: 500,
           query: {
             match_all: {},
           },
@@ -66,8 +66,29 @@ export class BooksService {
 
   async findOne(id: string) {
     try {
-      const res = await axios.get(
-        `http://${process.env.DB_URL}/library/_doc/${id}`,
+      const res = await axios.post(
+        `http://${process.env.DB_URL}/library/_search`,
+        {
+          query: {
+            term: {
+              _id: id,
+            },
+          },
+          aggs: {
+            nested_ratings: {
+              nested: {
+                path: 'ratings',
+              },
+              aggs: {
+                note_avg: {
+                  avg: {
+                    field: 'ratings.rating',
+                  },
+                },
+              },
+            },
+          },
+        },
       );
 
       return res.data;

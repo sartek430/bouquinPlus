@@ -3,9 +3,10 @@ import TopBar from "../components/TopBar.vue";
 
 export default {
     components: { TopBar },
-    data(): { book: any } {
+    data(): { book: any, aggregations: any } {
         return {
-            book: []
+            book: [],
+            aggregations: {}
         };
     },
     mounted() {
@@ -16,7 +17,9 @@ export default {
             try {
                 const response = await fetch(`http://127.0.0.1:3000/books/${this.$route.params.id}`);
                 if (response.ok) {
-                    this.book = await response.json();
+                    const d = await response.json();
+                    this.book = d.hits.hits[0];
+                    this.aggregations = d.aggregations;
                     console.log('Données Elasticsearch :', this.book);
                     // Faites quelque chose avec les données reçues
                 } else {
@@ -44,6 +47,15 @@ export default {
         <p><strong>Date:</strong> {{ book._source.releaseDate }}</p>
         <p><strong>Prix:</strong> {{ book._source.price }}€</p>
         <p class="description"><strong>Description:</strong> {{ book._source.description }}</p>
+        <p><strong>Moyenne des notes:</strong> {{ aggregations.nested_ratings.note_avg.value.toFixed(2) }} / 5</p>
+    </div>
+    <div class="details-notes">
+        <h2>Notes</h2>
+        <div v-for="(note, index) in book._source?.ratings" :key="index">
+            <p><strong>Utilisateur:</strong> {{ note?.username ?? 'Inconnu' }}</p>
+            <p><strong>Note:</strong> {{ note?.rating ?? "?" }} / 5</p>
+            <hr>
+        </div>
     </div>
 </template>
 

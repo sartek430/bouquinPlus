@@ -17,7 +17,6 @@ export default {
     },
     mounted() {
         this.aggregations = this.filters as Aggregations;
-        console.log("agg", this.aggregations);
     },
 }
 </script>
