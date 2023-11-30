@@ -1,11 +1,14 @@
 <script lang ="ts">
+import SideBar from "../components/SideBar.vue";
 import TopBar from "../components/TopBar.vue";
+import { Aggregations } from "../models/Aggregations";
 
 export default {
-    components: { TopBar },
-    data(): { books: any } {
+    components: { TopBar, SideBar },
+    data(): { books: any, aggregations: Aggregations } {
         return {
-            books: []
+            books: [],
+            aggregations: {}
         };
     },
     mounted() {
@@ -18,8 +21,7 @@ export default {
                 if (response.ok) {
                     const data = await response.json();
                     this.books = data.hits.hits;
-                    console.log('Données Elasticsearch :', this.books);
-                    // Faites quelque chose avec les données reçues
+                    this.aggregations = data.aggregations;
                 } else {
                     console.error('La requête a échoué :', response.status);
                 }
@@ -32,13 +34,14 @@ export default {
 </script>
 
 <template>
-    <TopBar></TopBar>
+    <TopBar />
+    <SideBar  :filters="aggregations" />
     <div v-if="books.length === 0">Chargement...</div>
     <ul v-else>
         <li v-for="(book, index) in books" :key="index">
-            <h3>{{ book._source.title }}</h3>
-            <p><strong>Auteur:</strong> {{ book._source.author.fullname }}</p>
-            <p><strong>Description:</strong> {{ book._source.description }}</p>
+            <h3>{{ book._source?.title ?? 'Titre inconnu' }}</h3>
+            <p><strong>Auteur:</strong> {{ book._source?.author?.fullname ?? 'Inconnu' }}</p>
+            <p><strong>Description:</strong> {{ book._source?.description }}</p>
             <hr>
         </li>
     </ul>
