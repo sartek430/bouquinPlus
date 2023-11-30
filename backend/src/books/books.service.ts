@@ -4,6 +4,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import axios from 'axios';
+import { SearchDto } from './dto/search.dto';
 
 @Injectable()
 export class BooksService {
@@ -79,7 +80,53 @@ export class BooksService {
     }
   }
 
-  async search(query: PlainLiteralObject) {
+  async search(query: SearchDto) {
+    try {
+      const res = await axios.post(
+        `http://${process.env.DB_URL}/library/_search`,
+        {
+          query: {
+            bool: {
+              should: [
+                {
+                  match: {
+                    title: {
+                      query: query.text,
+                      boost: 2,
+                    },
+                  },
+                },
+                {
+                  match: {
+                    author: {
+                      query: query.text,
+                      boost: 1,
+                    }
+                  },
+                },
+                {
+                  match: {
+                    description: {
+                      query: query.text,
+                      boost: 1,
+                    }
+                  },
+                }
+              ],
+            },
+          },
+        },
+      );
+
+      return res.data.hits.hits;
+    } catch (error) {
+      throw new ServiceUnavailableException(
+        error.message ?? error.response ?? error,
+      );
+    }
+  }
+
+  async customSearch(query: PlainLiteralObject) {
     try {
       const res = await axios.post(
         `http://${process.env.DB_URL}/library/_search`,

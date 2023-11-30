@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, PlainLiteralObject, Post } from '@nestjs/common';
 import { BooksService } from './books.service';
+import { SearchDto } from './dto/search.dto';
 
 @Controller('books')
 export class BooksController {
@@ -21,8 +22,13 @@ export class BooksController {
   }
 
   @Post('search')
-  search(@Body() query: PlainLiteralObject) {
+  search(@Body() query: SearchDto) {
     return this.booksService.search(query);
+  }
+
+  @Post('customSearch')
+  customSearch(@Body() query: PlainLiteralObject) {
+    return this.booksService.customSearch(query);
   }
 
   @Patch(':id')
