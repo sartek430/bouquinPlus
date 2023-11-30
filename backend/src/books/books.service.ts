@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import axios from 'axios';
 import { SearchDto } from './dto/search.dto';
+import { FilterDto } from './dto/filter.dto';
 
 @Injectable()
 export class BooksService {
@@ -103,6 +104,74 @@ export class BooksService {
     }
   }
 
+  async filter(query: FilterDto) {
+    try {
+      const o = {
+        size: 10000,
+        query: {
+          bool: {
+            filter: [],
+          },
+        },
+        aggs: {
+          prix_moyen: {
+            avg: {
+              field: 'price',
+            },
+          },
+          categories: {
+            terms: {
+              field: 'category.keyword',
+            },
+          },
+          subCategories: {
+            terms: {
+              field: 'subCategory.keyword',
+            },
+          },
+          editionNames: {
+            terms: {
+              field: 'edition.name.keyword',
+            },
+          },
+        },
+      };
+
+      if (query.editor) {
+        o.query.bool.filter.push({
+          terms: {
+            'edition.name.keyword': query.editor,
+          },
+        });
+      }
+      if (query.category) {
+        o.query.bool.filter.push({
+          terms: {
+            'category.keyword': query.category,
+          },
+        });
+      }
+      if (query.subCategory) {
+        o.query.bool.filter.push({
+          terms: {
+            'subCategory.keyword': query.subCategory,
+          },
+        });
+      }
+
+      const res = await axios.post(
+        `http://${process.env.DB_URL}/library/_search`,
+        o,
+      );
+
+      return res.data;
+    } catch (error) {
+      throw new ServiceUnavailableException(
+        error.message ?? error.response ?? error,
+      );
+    }
+  }
+
   async search(query: SearchDto) {
     try {
       const res = await axios.post(
@@ -116,6 +185,13 @@ export class BooksService {
                 { match: { description: query.text } },
                 { match: { 'author.fullname': query.text } },
               ],
+            },
+          },
+          highlight: {
+            fields: {
+              title: {},
+              description: {},
+              'author.fullname': {},
             },
           },
           aggs: {

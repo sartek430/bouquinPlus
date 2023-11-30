@@ -9,6 +9,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
+import { FilterDto } from './dto/filter.dto';
 import { SearchDto } from './dto/search.dto';
 
 @Controller('books')
@@ -28,6 +29,11 @@ export class BooksController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.booksService.findOne(id);
+  }
+
+  @Post('filter')
+  filter(@Body() query: FilterDto) {
+    return this.booksService.filter(query);
   }
 
   @Post('search')
