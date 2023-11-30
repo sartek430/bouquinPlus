@@ -49,7 +49,11 @@ export default {
     </form>
     <ul v-if="searchResult && searchResult.length > 0">
       <li v-for="(result, index) in searchResult" :key="index">
-        <span v-html="result.highlight['author.fullname'][0]"></span>, <strong><span v-html="result.highlight['title'][0]"></span></strong>
+        <span v-if="result?.highlight?.['author.fullname']?.[0]" v-html="result.highlight['author.fullname'][0]"></span>
+        <span v-else>{{ result._source.author.fullname }}</span>
+        -
+        <span v-if="result?.highlight?.['title']?.[0]" v-html="result.highlight['title'][0]"></span>
+        <span v-else>{{ result._source.title }}</span>
       </li>
     </ul>
     <p v-else>Aucun résultat trouvé.</p>
