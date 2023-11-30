@@ -35,14 +35,24 @@ export default {
 
 <template>
     <TopBar />
-    <SideBar  :filters="aggregations" />
-    <div v-if="books.length === 0">Chargement...</div>
-    <ul v-else>
-        <li v-for="(book, index) in books" :key="index">
-            <h3>{{ book._source?.title ?? 'Titre inconnu' }}</h3>
-            <p><strong>Auteur:</strong> {{ book._source?.author?.fullname ?? 'Inconnu' }}</p>
-            <p><strong>Description:</strong> {{ book._source?.description }}</p>
-            <hr>
-        </li>
-    </ul>
+    <div class="home">
+        <SideBar :filters="aggregations" v-if="Object.keys(aggregations).length > 0" />
+        <div v-if="books.length === 0">Chargement...</div>
+        <ul v-else>
+            <li v-for="(book, index) in books" :key="index">
+                <h3>{{ book._source?.title ?? 'Titre inconnu' }}</h3>
+                <p><strong>Auteur:</strong> {{ book._source?.author?.fullname ?? 'Inconnu' }}</p>
+                <p><strong>Description:</strong> {{ book._source?.description }}</p>
+                <hr>
+            </li>
+        </ul>
+    </div>
 </template>
+
+<style>
+.home {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+</style>
