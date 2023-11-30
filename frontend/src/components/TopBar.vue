@@ -8,6 +8,10 @@ export default {
   },
   methods: {
     async search() {
+      if (!this.searchText || this.searchText == "") {
+        this.searchResult = [];
+        return;
+      }
       try {
         // Faites votre requête fetch ici
         const response = await fetch("http://127.0.0.1:3000/books/search", {
@@ -43,7 +47,7 @@ export default {
         @input="search"
       />
     </form>
-    <ul v-if="searchResult && searchResult.length">
+    <ul v-if="searchResult && searchResult.length > 0">
       <li v-for="(result, index) in searchResult" :key="index">
         <span v-html="result.highlight['author.fullname'][0]"></span>, <strong><span v-html="result.highlight['title'][0]"></span></strong>
       </li>
